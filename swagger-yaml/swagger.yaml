@@ -1,0 +1,544 @@
+---
+swagger: "2.0"
+info:
+  description: "Reference API for electronic publication of House of Commons Register\
+    \ of Members Financial Interests information"
+  version: "1.0.0"
+  title: "Register of Members Financial Interests API"
+  contact:
+    email: "rob@membersinterests.org.uk"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "virtserver.swaggerhub.com"
+basePath: "/robtyers/RMFI/1.0.0"
+tags:
+- name: "public"
+  description: "Operations available to general public"
+schemes:
+- "https"
+- "http"
+paths:
+  /registerEntry:
+    get:
+      tags:
+      - "public"
+      summary: "return Register of Members Financial Interests register entries"
+      description: "Search for register entries by date\n"
+      operationId: "getRegister"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "asAtDate"
+        in: "query"
+        description: "pass a date to return a corresponding list of register entries"
+        required: true
+        type: "string"
+      - name: "memberId"
+        in: "query"
+        description: "pass an optional memberId to filter register entries by member"
+        required: false
+        type: "string"
+      - name: "skip"
+        in: "query"
+        description: "number of records to skip for pagination"
+        required: false
+        type: "integer"
+        minimum: 0
+        format: "int32"
+      - name: "limit"
+        in: "query"
+        description: "maximum number of records to return"
+        required: false
+        type: "integer"
+        maximum: 50
+        minimum: 0
+        format: "int32"
+      responses:
+        200:
+          description: "search results matching criteria"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/RegisterEntry"
+        400:
+          description: "bad input parameter"
+        404:
+          description: "register not found"
+definitions:
+  Session:
+    type: "object"
+    required:
+    - "id"
+    - "yearFrom"
+    - "yearTo"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+      yearFrom:
+        type: "integer"
+        example: 2016
+      yearTo:
+        type: "integer"
+        example: 2017
+  Constituency:
+    type: "object"
+    required:
+    - "id"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0852"
+      name:
+        type: "string"
+        example: "Maidenhead"
+  Party:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+        example: "Conservative"
+  Member:
+    type: "object"
+    required:
+    - "constituency"
+    - "forename"
+    - "id"
+    - "party"
+    - "surname"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0853"
+      title:
+        type: "string"
+        example: "Mrs"
+        enum:
+        - "Dr"
+        - "Mr"
+        - "Mrs"
+        - "Ms"
+        - "Sir"
+      forename:
+        type: "string"
+        example: "Theresa"
+      surname:
+        type: "string"
+        example: "May"
+      party:
+        $ref: "#/definitions/Party"
+      constituency:
+        $ref: "#/definitions/Constituency"
+  Register:
+    type: "object"
+    required:
+    - "asAtDate"
+    - "id"
+    - "session"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0854"
+      session:
+        $ref: "#/definitions/Session"
+      asAtDate:
+        type: "string"
+        format: "date"
+        example: "2017-03-06"
+  RegisterEntry:
+    type: "object"
+    required:
+    - "id"
+    - "member"
+    - "register"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0855"
+      register:
+        $ref: "#/definitions/Register"
+      member:
+        $ref: "#/definitions/Member"
+      registerEntryItem:
+        type: "array"
+        items:
+          $ref: "#/definitions/RegisterEntryItem"
+  RegisterEntryItem:
+    type: "object"
+    required:
+    - "id"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0856"
+      employmentAndEarning:
+        type: "array"
+        items:
+          $ref: "#/definitions/EmploymentAndEarning"
+      support:
+        type: "array"
+        items:
+          $ref: "#/definitions/Donation"
+      supportOther:
+        type: "array"
+        items:
+          $ref: "#/definitions/Donation"
+      gift:
+        type: "array"
+        items:
+          $ref: "#/definitions/Donation"
+      visitOutsideUK:
+        type: "array"
+        items:
+          $ref: "#/definitions/Visit"
+      landAndProperty:
+        type: "array"
+        items:
+          $ref: "#/definitions/Portfolio"
+      shareholding:
+        type: "array"
+        items:
+          $ref: "#/definitions/Shareholding"
+      miscellaneous:
+        type: "array"
+        items:
+          $ref: "#/definitions/Miscellaneous"
+      familyMemberEmployment:
+        type: "array"
+        items:
+          $ref: "#/definitions/FamilyMember"
+  EmploymentAndEarning:
+    type: "object"
+    required:
+    - "amountOrValue"
+    - "companyAddress"
+    - "companyName"
+    - "id"
+    - "registeredOn"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0853"
+      companyName:
+        type: "string"
+        example: "Institute of Travel and Tourism"
+      industryType:
+        type: "string"
+        example: "Professional Body"
+      positionHeld:
+        type: "string"
+        example: "Supervisory Board Member"
+      companyAddress:
+        $ref: "#/definitions/Address"
+      amountOrValue:
+        $ref: "#/definitions/Value"
+      numberOfHours:
+        type: "number"
+        format: "float"
+        example: 2.5
+      comment:
+        type: "string"
+        example: "Delivering lectures"
+      dateFrom:
+        type: "string"
+        format: "date"
+        example: "2016-03-29"
+      dateTo:
+        type: "string"
+        format: "date"
+        example: "2017-03-29"
+      dateReceived:
+        type: "string"
+        format: "date"
+        example: "2016-07-06"
+      registeredOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      updatedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-31T09:33:00.001Z"
+  Donation:
+    type: "object"
+    required:
+    - "addressOfDoner"
+    - "amountOrValue"
+    - "dateAccepted"
+    - "dateReceived"
+    - "donorStatus"
+    - "id"
+    - "nameOfDoner"
+    - "registeredOn"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0853"
+      nameOfDoner:
+        type: "string"
+        example: "Sunmark Ltd"
+      addressOfDoner:
+        $ref: "#/definitions/Address"
+      amountOrValue:
+        $ref: "#/definitions/Value"
+      dateReceived:
+        type: "string"
+        format: "date"
+        example: "2016-07-06"
+      dateAccepted:
+        type: "string"
+        format: "date"
+        example: "2016-08-01"
+      registeredOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      donorStatus:
+        $ref: "#/definitions/DonorStatus"
+      updatedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-31T09:33:00.001Z"
+  Visit:
+    type: "object"
+    required:
+    - "addressOfDoner"
+    - "amountOrValue"
+    - "dateOfVisitFrom"
+    - "dateOfVisitTo"
+    - "destinationOfVisit"
+    - "id"
+    - "nameOfDoner"
+    - "purposeOfVisit"
+    - "registeredOn"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0853"
+      nameOfDoner:
+        type: "string"
+        example: "The Ministry of Foreign Affairs of the Republic of Maldives"
+      addressOfDoner:
+        $ref: "#/definitions/Address"
+      amountOrValue:
+        $ref: "#/definitions/Value"
+      destinationOfVisit:
+        type: "string"
+        example: "Republic of Maldives"
+      dateOfVisitFrom:
+        type: "string"
+        format: "date"
+        example: "2017-03-31"
+      dateOfVisitTo:
+        type: "string"
+        format: "date"
+        example: "2017-03-31"
+      purposeOfVisit:
+        type: "string"
+        example: "Delegation of members of APPG for the Maldives. The group met with\
+          \ opposition and government MPs of all parties, political prisoners and\
+          \ members of the judiciary."
+      registeredOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      updatedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-31T09:33:00.001Z"
+  Shareholding:
+    type: "object"
+    required:
+    - "category"
+    - "companyName"
+    - "id"
+    - "industryType"
+    - "registeredOn"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0853"
+      category:
+        type: "string"
+        example: "(i) Shareholdings over 15% of issued share capital"
+        enum:
+        - "(i) Shareholdings over 15% of issued share capital"
+      PurchasedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      SoldOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      companyName:
+        type: "string"
+        example: "CGLV Limited"
+      industryType:
+        type: "string"
+        example: "Consultancy Business"
+      description:
+        type: "string"
+        example: "Sole owner"
+      registeredOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      updatedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-31T09:33:00.001Z"
+  Portfolio:
+    type: "object"
+    required:
+    - "category"
+    - "id"
+    - "portfolioType"
+    - "registeredOn"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0853"
+      category:
+        type: "string"
+        example: "(ii) giving rental income of over £10,000 a year"
+        enum:
+        - "(i) value over £100,000"
+        - "(ii) giving rental income of over £10,000 a year"
+        - "(i) value over £100,000 and (ii) giving rental income of over £10,000 a\
+          \ year"
+      portfolioType:
+        type: "string"
+        example: "house"
+        enum:
+        - "flat"
+        - "house"
+        - "land"
+        - "smallholdingOrFarm"
+      description:
+        type: "string"
+        example: "Residential property"
+      region:
+        type: "string"
+        example: "London"
+      PurchasedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      SoldOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      registeredOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      updatedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-31T09:33:00.001Z"
+  FamilyMember:
+    type: "object"
+    required:
+    - "id"
+    - "name"
+    - "registeredOn"
+    - "relationship"
+    - "role"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0853"
+      name:
+        type: "string"
+        example: "Jennifer Dorries"
+      relationship:
+        type: "string"
+        example: "daughter"
+        enum:
+        - "wife"
+        - "husband"
+        - "partner"
+        - "daughter"
+      role:
+        type: "string"
+        example: "Senior Secretary"
+      registeredOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      updatedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-31T09:33:00.001Z"
+  Miscellaneous:
+    type: "object"
+    required:
+    - "description"
+    - "registeredOn"
+    properties:
+      description:
+        type: "string"
+        example: "Vice-President (unremunerated) of the Cardiff and District United\
+          \ Nations Association"
+      registeredOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-29T14:22:00.001Z"
+      updatedOn:
+        type: "string"
+        format: "date-time"
+        example: "2017-03-31T09:33:00.001Z"
+  DonorStatus:
+    type: "object"
+    properties:
+      companyRegistration:
+        type: "string"
+        example: "3010238"
+  Address:
+    type: "object"
+    properties:
+      AddressLine1:
+        type: "string"
+        example: "428 Long Drive"
+      AddressLine2:
+        type: "string"
+      AddressLine3:
+        type: "string"
+      City:
+        type: "string"
+        example: "Greenford"
+      PostalCode:
+        type: "string"
+        example: "UB6 8UH"
+      Country:
+        type: "string"
+        example: "United Kingdom"
+  Value:
+    type: "object"
+    required:
+    - "amount"
+    - "currency"
+    properties:
+      currency:
+        type: "string"
+        example: "GBP"
+      amount:
+        type: "number"
+        format: "float"
+        example: 25000.0
